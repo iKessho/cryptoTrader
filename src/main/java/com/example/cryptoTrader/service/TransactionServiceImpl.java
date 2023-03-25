@@ -5,7 +5,9 @@ import com.example.cryptoTrader.domain.Transaction;
 import com.example.cryptoTrader.domain.Wallet;
 import com.example.cryptoTrader.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -52,13 +54,13 @@ public class TransactionServiceImpl implements TransactionService{
                     .filter(wallet -> wallet.getCurrency()
                             .equalsIgnoreCase("USDT"))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Currency not found in wallet"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough balance"));
             String pair = transaction.getCurrency().concat("USDT");
             Price currentPrice = priceService.getPairPrice(pair);
             BigDecimal askPrice = currentPrice.getAskPrice();
             BigDecimal requiredAmt = askPrice.multiply(transaction.getAmount());
             if (usdtWallet.getBalance().compareTo(requiredAmt) < 0) {
-                throw new IllegalStateException("Not enough balance");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough balance");
             }
             transaction.setPrice(askPrice);
             transaction.setDate(LocalDateTime.now());
@@ -78,9 +80,9 @@ public class TransactionServiceImpl implements TransactionService{
                     .filter(wallet -> wallet.getCurrency()
                             .equalsIgnoreCase(transaction.getCurrency()))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Currency not found in wallet"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough balance"));
             if (targetWallet.getBalance().compareTo(transaction.getAmount()) < 0 ) {
-                throw new IllegalStateException("Not enough balance");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough balance");
             }
             String pair = transaction.getCurrency().concat("USDT");
             Price currentPrice = priceService.getPairPrice(pair);
@@ -96,6 +98,6 @@ public class TransactionServiceImpl implements TransactionService{
             return response;
         }
 
-        throw new IllegalArgumentException("Unrecognized type");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unrecognized Type");
     }
 }
