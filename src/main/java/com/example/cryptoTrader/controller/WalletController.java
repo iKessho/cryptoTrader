@@ -17,6 +17,11 @@ public class WalletController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> getWallet(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(walletRepository.findById(userId).orElse(null));
+        return ResponseEntity.ok().body(walletRepository.findByUserId(userId));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllWallets() {
+        return ResponseEntity.ok().body(walletRepository.findAll());
     }
 }
