@@ -5,7 +5,7 @@ import com.example.cryptoTrader.domain.Transaction;
 import java.util.List;
 
 public interface TransactionService {
-    public List<Transaction> getAllTransactions(Long userId);
+    public List<Transaction> getAllTransactions();
 
     public List<Transaction> getTransactionsByUserId(Long userId);
 

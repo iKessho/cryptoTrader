@@ -12,19 +12,30 @@ import org.springframework.web.bind.annotation.*;
 public class TransactionController {
 
     @Autowired
-    TransactionRepository transactionRepository;
-
-    @Autowired
     TransactionService transactionService;
 
+    /**
+     * Get all transactions from everyone. TODO: restrict to admins only
+     * @return List of transactions
+     */
+    @GetMapping
+    public ResponseEntity<?> getAllTransactions() {
+        return ResponseEntity.ok().body(transactionService.getAllTransactions());
+    }
+
+    /**
+     * Get all transactions from specified userId.
+     * TODO: allow the userId to be retrieved via SecurityContext.
+     * @param userId
+     * @return List of transactions
+     */
     @GetMapping("/{userId}")
     public ResponseEntity<?> getTransactions(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(transactionRepository.findById(userId).orElse(null));
+        return ResponseEntity.ok().body(transactionService.getTransactionsByUserId(userId));
     }
 
     @PostMapping("/{userId}")
     public ResponseEntity<?> trade (@PathVariable Long userId, @RequestBody Transaction transaction) {
-        transactionService.trade(userId, transaction);
-        return null;
+        return ResponseEntity.ok().body(transactionService.trade(userId, transaction));
     }
 }

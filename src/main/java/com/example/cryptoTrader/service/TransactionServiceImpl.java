@@ -2,6 +2,7 @@ package com.example.cryptoTrader.service;
 
 import com.example.cryptoTrader.domain.Price;
 import com.example.cryptoTrader.domain.Transaction;
+import com.example.cryptoTrader.domain.User;
 import com.example.cryptoTrader.domain.Wallet;
 import com.example.cryptoTrader.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,17 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired
     PriceService priceService;
 
+    @Autowired
+    UserService userService;
+
     @Override
-    public List<Transaction> getAllTransactions(Long userId) {
-        return null;
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
     }
 
     @Override
     public List<Transaction> getTransactionsByUserId(Long userId) {
-        return null;
+        return transactionRepository.findByUserId(userId);
     }
 
 
@@ -64,6 +68,9 @@ public class TransactionServiceImpl implements TransactionService{
             }
             transaction.setPrice(askPrice);
             transaction.setDate(LocalDateTime.now());
+            User user = new User();
+            user.setId(userId);
+            transaction.setUser(user);
             Transaction response = transactionRepository.save(transaction);
             usdtWallet.setBalance(usdtWallet.getBalance().subtract(requiredAmt));
             Wallet targetWallet = walletService.getWalletByUserIdAndCurrency(userId, transaction.getCurrency());
@@ -88,6 +95,9 @@ public class TransactionServiceImpl implements TransactionService{
             Price currentPrice = priceService.getPairPrice(pair);
             transaction.setPrice(currentPrice.getBidPrice());
             transaction.setDate(LocalDateTime.now());
+            User user = new User();
+            user.setId(userId);
+            transaction.setUser(user);
             Transaction response = transactionRepository.save(transaction);
             targetWallet.setBalance(targetWallet.getBalance().subtract(transaction.getAmount()));
             Wallet usdtWallet = walletService.getWalletByUserIdAndCurrency(userId, "USDT");

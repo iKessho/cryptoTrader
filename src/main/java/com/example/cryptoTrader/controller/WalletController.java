@@ -19,6 +19,12 @@ public class WalletController {
     @Autowired
     WalletService walletService;
 
+    /**
+     * Get all wallet balance from specified userId.
+     * TODO: allow the userId to be retrieved via SecurityContext.
+     * @param userId
+     * @return List of wallet with coins and balance
+     */
     @GetMapping("/{userId}")
     public ResponseEntity<?> getWallet(@PathVariable Long userId) {
         return ResponseEntity.ok().body(walletService.getWalletsByUserId(userId));
